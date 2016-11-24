@@ -1,7 +1,9 @@
 package com.github.ustc_zzzz.virtualsign.api;
 
 /**
- * An interface to provide convenient method for creating a virtual sign.
+ * An interface to provide convenient method for creating a virtual sign. See
+ * {@link org.spongepowered.api.service.ServiceManager#provide(Class)} and
+ * {@link org.spongepowered.api.service.ServiceManager#provideUnchecked(Class)}.
  *
  * @author zzzz
  */
