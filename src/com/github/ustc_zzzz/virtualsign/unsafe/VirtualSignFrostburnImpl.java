@@ -5,6 +5,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.BiConsumer;
 
@@ -132,15 +133,19 @@ public class VirtualSignFrostburnImpl implements VirtualSign
                         @Override
                         public void handle(ChangeSignEvent event) throws Exception
                         {
-                            if (VirtualSignFrostburnImpl.this.callback != null)
+                            Optional<Player> optional = event.getCause().first(Player.class);
+                            if (optional.isPresent() && optional.get() == nmsPlayer)
                             {
-                                VirtualSignFrostburnImpl.this.callback.accept(player, event.getText().asList());
+                                if (VirtualSignFrostburnImpl.this.callback != null)
+                                {
+                                    VirtualSignFrostburnImpl.this.callback.accept(player, event.getText().asList());
+                                }
+                                nmsWorld.removeTileEntity(pos);
+                                nmsWorld.setBlockState(pos, Blocks.AIR.getDefaultState(), 0);
+                                nmsPlayer.connection.sendPacket(new SPacketBlockChange(nmsWorld, pos));
+                                event.setCancelled(true);
+                                Sponge.getEventManager().unregisterListeners(this);
                             }
-                            nmsWorld.removeTileEntity(pos);
-                            nmsWorld.setBlockState(pos, Blocks.AIR.getDefaultState(), 0);
-                            nmsPlayer.connection.sendPacket(new SPacketBlockChange(nmsWorld, pos));
-                            event.setCancelled(true);
-                            Sponge.getEventManager().unregisterListeners(this);
                         }
                     };
                     Sponge.getEventManager().registerListener(this.plugin, ChangeSignEvent.class, Order.FIRST, el);
